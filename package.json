@@ -19,6 +19,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.5.2",
     "babel-preset-flow": "^6.23.0",
+    "babel-preset-latest-node": "^0.4.0",
     "babel-preset-stage-0": "^6.24.1",
     "eslint": "^4.11.0",
     "eslint-config-airbnb": "^16.1.0",
@@ -26,14 +27,12 @@
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-react": "^7.4.0",
     "flow-bin": "^0.44.2",
-    "jest": "^20.0.4",
-    "rollup": "^0.43.0",
-    "rollup-plugin-babel": "^3.0.2"
+    "jest": "^20.0.4"
   },
   "scripts": {
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "build": "rollup -c",
+    "build": "babel src --ignore .spec.js -d lib",
     "install": "./update-protos.sh",
     "prepublish": "yarn run build"
   },

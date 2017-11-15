@@ -1,28 +1,8 @@
 {
   "plugins": [
-    "babel-plugin-transform-class-properties",
+    "transform-flow-strip-types",
     "transform-object-rest-spread",
-    "transform-export-extensions"
+    "transform-export-extensions",
   ],
-  "env": {
-    "test": {
-      "presets": [
-        "env",
-        "flow",
-        "stage-0"
-      ]
-    },
-    "development": {
-      "presets": [
-        [
-          "env",
-          {
-            "modules": false
-          }
-        ],
-        "flow",
-        "stage-0"
-      ]
-    }
-  }
+  "presets": [["latest-node", { "target": "current" }]]
 }
