@@ -1,5 +1,5 @@
-import { createLinRead, createTxnContext } from '../src/convert'
-import protos from '../src/protos'
+import { createLinRead, createTxnContext } from '../convert'
+import protos from '../protos'
 
 describe('convert', () => {
   it('should create a TxnContext object', () => {

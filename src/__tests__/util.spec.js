@@ -1,6 +1,6 @@
 /* eslint-disable quote-props */
 /* eslint-disable quotes */
-import { mergeMax } from '../src/util'
+import { mergeMax } from '../util'
 
 describe('util', () => {
   describe('mergeMax', () => {

@@ -1,5 +1,5 @@
-import DgraphClient from '../src/dgraph'
-import DgraphTransaction from '../src/transaction'
+import DgraphClient from '../dgraph'
+import DgraphTransaction from '../transaction'
 
 let client
 let txn

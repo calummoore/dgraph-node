@@ -1,10 +1,13 @@
 # dgraph-node
 
-A node dgraph client - until Dgraph release an official version.
+A NodeJS Dgraph client (until Dgraph release an official version).
+
+Note: this API may be subject to change with only minor release version.
 
 #### Benefits:
  - Fast (gRPC)
  - Works with Dgraph v0.9
+ - Supports transactions
 
 ### Example
 

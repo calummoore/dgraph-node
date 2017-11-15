@@ -1,5 +1,5 @@
-import DgraphClient from '../src/dgraph'
-import { mergeMax } from '../src/util'
+import DgraphClient from '../dgraph'
+import { mergeMax } from '../util'
 
 let client
 const queryById = (id = '0xcceb', fields = 'name') => {

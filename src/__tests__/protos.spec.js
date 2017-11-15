@@ -1,4 +1,4 @@
-import protos from '../src/protos'
+import protos from '../protos'
 
 describe('protos', () => {
   it('match snapshot', () => {
