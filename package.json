@@ -9,6 +9,7 @@
     "lib",
     "update-protos.sh"
   ],
+  "main": "lib/index.js",
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-eslint": "^8.0.2",
