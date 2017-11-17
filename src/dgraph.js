@@ -33,7 +33,7 @@ export default class DgraphClient {
     const queryRequest = new protos.Request()
     queryRequest.query = query
     if (linRead || this.linRead) queryRequest.lin_read = createLinRead(linRead || this.linRead)
-    if (this.debug) console.log(`Query request: \n${JSON.stringify(query, null, '  ')}`)
+    if (this.config.debug) console.log(`Query request: \n${JSON.stringify(query, null, '  ')}`)
     const resp = await this._query(queryRequest)
     this.updateContext(resp.txn)
     return {
@@ -48,7 +48,7 @@ export default class DgraphClient {
     if (mutation.del) mutationRequest.del_nquads = Buffer.from(mutation.del, 'utf8')
     if (startTs) mutationRequest.start_ts = startTs
     mutationRequest.commit_now = commit
-    if (this.debug) console.log(`Mutation request: \n${JSON.stringify(mutation, null, '  ')}`)
+    if (this.config.debug) console.log(`Mutation request: \n${JSON.stringify(mutation, null, '  ')}`)
     const resp = await this._mutate(mutationRequest)
     return {
       data: {
