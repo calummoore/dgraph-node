@@ -1,8 +1,16 @@
 # dgraph-node
 
+[![Build Status](https://travis-ci.org/calummoore/dgraph-node.svg?branch=master)](https://travis-ci.org/calummoore/dgraph-node)
+
 A NodeJS Dgraph client.
 
 Note: this API may be subject to change with only minor release version.
+
+Install with:
+
+```
+npm install dgraph-node
+```
 
 #### Benefits:
  - Fast (gRPC)
@@ -24,7 +32,7 @@ await client.mutate({
 
 // Delete mutation
 await client.mutate({
-  del: '<0x100> * *',
+  del: '<0x100> * * .',
 })
 
 // Query
