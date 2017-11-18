@@ -22,6 +22,7 @@
     "babel-preset-flow": "^6.23.0",
     "babel-preset-latest-node": "^0.4.0",
     "babel-preset-stage-0": "^6.24.1",
+    "coveralls": "^3.0.0",
     "eslint": "^4.11.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",
@@ -32,6 +33,7 @@
   },
   "scripts": {
     "test": "jest --coverage",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "test:watch": "jest --watch",
     "build": "babel src --ignore .spec.js -d lib",
     "install": "./update-protos.sh",
