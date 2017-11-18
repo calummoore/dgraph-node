@@ -1,6 +1,6 @@
 # dgraph-node
 
-A NodeJS Dgraph client (until Dgraph release an official version).
+A NodeJS Dgraph client.
 
 Note: this API may be subject to change with only minor release version.
 
@@ -17,9 +17,14 @@ import DgraphClient from 'dgraph-node';
 // Create a new client
 let client = new DgraphClient()
 
-// Mutation
+// Set mutation
 await client.mutate({
   set: '<_:bob> <name> "Bob" .'
+})
+
+// Delete mutation
+await client.mutate({
+  del: '<0x100> * *',
 })
 
 // Query
