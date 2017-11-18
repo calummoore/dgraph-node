@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/calummoore/dgraph-node.svg?branch=master)](https://travis-ci.org/calummoore/dgraph-node)
 
+[![Coverage Status](https://coveralls.io/repos/github/calummoore/dgraph-node/badge.svg?branch=master)](https://coveralls.io/github/calummoore/dgraph-node?branch=master)
+
 A NodeJS Dgraph client.
 
 Note: this API may be subject to change with only minor release version.
