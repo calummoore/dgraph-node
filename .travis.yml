@@ -1,0 +1,11 @@
+sudo: required
+
+language: node_js
+
+services:
+  - docker
+
+before_install:
+- docker pull dgraph/dgraph:v0.9.1
+- docker run -it -p 8080:8080 -p 9080:9080 --name diggy dgraph/dgraph dgraph zero --port_offset -2000
+- docker exec -it diggy dgraph server --memory_mb 2048 --zero localhost:5080
