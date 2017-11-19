@@ -36,10 +36,12 @@ export default class DgraphClient {
     if (this.config.debug) console.log(`Query request: \n${JSON.stringify(query, null, '  ')}`)
     const resp = await this._query(queryRequest)
     this.updateContext(resp.txn)
-    return {
+    const parsed = {
       data: JSON.parse(resp.json.toString()),
       context: resp.txn,
     }
+    if (this.config.debug) console.log(`Query response: \n${JSON.stringify(parsed, null, 2)}`)
+    return parsed
   }
 
   async mutate (mutation, commit = true, startTs) {
@@ -48,14 +50,16 @@ export default class DgraphClient {
     if (mutation.del) mutationRequest.del_nquads = Buffer.from(mutation.del, 'utf8')
     if (startTs) mutationRequest.start_ts = startTs
     mutationRequest.commit_now = commit
-    if (this.config.debug) console.log(`Mutation request: \n${JSON.stringify(mutation, null, '  ')}`)
+    if (this.config.debug) console.log(`Mutation request: \n${JSON.stringify(mutation, null, 2)}`)
     const resp = await this._mutate(mutationRequest)
-    return {
+    const parsed = {
       data: {
         uids: resp.uids,
       },
       context: resp.context,
     }
+    if (this.config.debug) console.log(`Mutation response: \n${JSON.stringify(parsed, null, 2)}`)
+    return parsed
   }
 
   async alter (schema) {
