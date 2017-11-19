@@ -76,7 +76,7 @@ async function tryUpsert (account) {
   return txn.commit()
 }
 
-describe('acctupsert', () => {
+xdescribe('acctupsert', () => {
   beforeEach(async () => {
     client = new DgraphClient()
     await client.dropAll()
