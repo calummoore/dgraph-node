@@ -33,7 +33,7 @@ export default class DgraphClient {
     const queryRequest = new protos.Request()
     queryRequest.query = query
     if (linRead || this.linRead) queryRequest.lin_read = createLinRead(linRead || this.linRead)
-    if (this.config.debug) console.log(`Query request: \n${JSON.stringify(query, null, '  ')}`)
+    if (this.config.debug) console.log(`Query request: \n${JSON.stringify(query, null, 2)}`)
     const resp = await this._query(queryRequest)
     this.updateContext(resp.txn)
     const parsed = {
