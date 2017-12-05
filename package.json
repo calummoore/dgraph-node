@@ -1,6 +1,6 @@
 {
   "name": "dgraph-node",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "NodeJS Client for dgraph",
   "repository": "https://github.com/calummoore/dgraph-node",
   "author": "Calum Moore",
