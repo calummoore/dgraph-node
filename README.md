@@ -21,13 +21,12 @@ npm install dgraph-node
 ### Example
 
 ```javascript
-import DgraphClient from 'dgraph-node';
+import DgraphClient from 'dgraph-node'
+// const DgraphClient = require('dgraph-node').default
 
 // Create a new client (these are the defaults)
 let client = new DgraphClient({
   url: 'localhost:9080',
-  debug: false,
-  credentials: grpc.credentials.createInsecure(),
 })
 
 // Set mutation
