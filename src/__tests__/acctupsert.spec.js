@@ -28,7 +28,7 @@ async function upsert (account, counter = 0) {
     await tryUpsert(account)
     console.log(`Success for ${account.first}_${account.last}_${account.age} after ${counter} attemps`)
   } catch (err) {
-    expect(err.toString()).toMatch(/conflict|aborted/)
+    expect(err.toString()).toMatch(/Conflicts|aborted/)
     if (counter + 1 >= maxAttempts) {
       throw new Error(`Account upsert for
           ${account.first}, ${account.last}, ${account.age}
@@ -76,7 +76,7 @@ async function tryUpsert (account) {
   return txn.commit()
 }
 
-xdescribe('acctupsert', () => {
+describe('acctupsert', () => {
   beforeEach(async () => {
     client = new DgraphClient()
     await client.dropAll()

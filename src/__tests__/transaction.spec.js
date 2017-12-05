@@ -108,7 +108,7 @@ describe('Transactions', () => {
     const commit2 = await txn2.commit()
     const commit1 = txn1.commit()
     expect(commit2).toMatchObject({ aborted: false })
-    expect(commit1).rejects.toEqual(new Error('Transaction aborted'))
+    await expect(commit1).rejects.toEqual(new Error('Transaction has been aborted. Please retry.'))
     const findBob = await client.query(queryById(bob))
     expect(findBob.data.q).toEqual([{ name: 'Bob2' }])
   })

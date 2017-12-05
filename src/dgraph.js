@@ -12,7 +12,7 @@ export default class DgraphClient {
       debug: false,
       ...userConfig,
     }
-
+    
     // Create gprc client into Dgraph
     const d = new protos.Dgraph(
       config.url,
