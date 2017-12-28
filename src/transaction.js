@@ -7,6 +7,7 @@ export default class Transaction {
   constructor (client) {
     this.client = client
     this.startTs = null
+    this.ignoreIndexConflict = false
     this.linRead = client.linRead
     this.keys = []
   }
@@ -18,7 +19,7 @@ export default class Transaction {
   }
 
   async mutate (mutation) {
-    const resp = await this.client.mutate(mutation, false, this.startTs)
+    const resp = await this.client.mutate(mutation, false, this.startTs, this.ignoreIndexConflict)
     this.updateContext(resp.context)
     return resp
   }

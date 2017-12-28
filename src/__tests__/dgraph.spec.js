@@ -43,6 +43,17 @@ describe('dgraph', () => {
     })
   })
 
+  it('should commit mutation with index', async () => {
+    const resp = await client.mutate({
+      set: '<_:bob> <name> "Bob" .',
+    }, true, undefined, true)
+    const { bob } = resp.data.uids
+    const query = await client.query(queryById(bob))
+    expect(query.data.q[0]).toEqual({
+      name: 'Bob',
+    })
+  })
+
   it('should drop the DB', async () => {
     const resp = await createBob()
     await client.dropAll()
