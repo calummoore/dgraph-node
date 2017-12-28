@@ -5,13 +5,14 @@
 
 A NodeJS Dgraph client.
 
-Note: this API may be subject to change with only minor release version.
 
 Install with:
 
 ```
 npm install dgraph-node
 ```
+
+## THERE IS NOW AN [OFFICIAL DGRAPH JS CLIENT](https://github.com/dgraph-io/dgraph-js). PLEASE USE THAT INSTEAD.
 
 #### Benefits:
  - Fast (gRPC)
