@@ -1,13 +1,12 @@
 {
   "name": "dgraph-node",
-  "version": "0.1.9",
+  "version": "0.2.2",
   "description": "NodeJS Client for dgraph",
   "repository": "https://github.com/calummoore/dgraph-node",
   "author": "Calum Moore",
   "license": "MIT",
   "files": [
-    "lib",
-    "update-protos.sh"
+    "lib"
   ],
   "main": "lib/index.js",
   "devDependencies": {
@@ -36,12 +35,9 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "test:watch": "jest --watch",
     "build": "babel src --ignore .spec.js -d lib",
-    "install": "./update-protos.sh",
     "prepublish": "yarn run build"
   },
   "dependencies": {
-    "es6-promisify": "^5.0.0",
-    "grpc": "^1.3.9",
-    "lodash": "^4.17.4"
+    "dgraph-js": "^1.1.1"
   }
 }

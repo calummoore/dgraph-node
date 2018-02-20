@@ -26,7 +26,7 @@ async function upsert (account, counter = 0) {
   // console.log(`${account.first}, ${account.last}: ${counter} `)
   try {
     await tryUpsert(account)
-    console.log(`Success for ${account.first}_${account.last}_${account.age} after ${counter} attemps`)
+    // console.log(`Success for ${account.first}_${account.last}_${account.age} after ${counter} attemps`)
   } catch (err) {
     expect(err.toString()).toMatch(/Conflicts|aborted/)
     if (counter + 1 >= maxAttempts) {

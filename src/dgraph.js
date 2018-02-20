@@ -1,92 +1,76 @@
-import grpc from 'grpc'
-import promisify from 'es6-promisify'
-import protos from './protos'
-import Transaction from './transaction'
-import { mergeMax } from './util'
-import { createLinRead } from './convert'
+import { DgraphClientStub, DgraphClient, Operation } from 'dgraph-js'
 
-export default class DgraphClient {
-  constructor (userConfig) {
-    const config = {
-      url: 'localhost:9080',
-      debug: false,
-      ...userConfig,
-    }
-    
-    // Create gprc client into Dgraph
-    const d = new protos.Dgraph(
-      config.url,
-      config.credentials || grpc.credentials.createInsecure(),
-    )
+import DgraphTransaction from './transaction'
 
-    // Promisfy the proto fns
-    this._mutate = promisify(d.mutate, d)
-    this._query = promisify(d.query, d)
-    this._alter = promisify(d.alter, d)
-    this._commitOrAbort = promisify(d.commitOrAbort, d)
+class DgraphNodeClient {
+  constructor (config = {}) {
+    let urls = config.url
 
-    this.linRead = null
-    this.config = config
+    // Make sure we have an array of urls
+    if (!Array.isArray(urls)) urls = [urls]
+
+    // Create a list of stubs to pass to client
+    this.stubs = urls.map((url) => {
+      return (new DgraphClientStub(
+        url,
+        config.credentials,
+      ))
+    })
+
+    // Create the client
+    this.client = new DgraphClient(...this.stubs)
+
+    // Set initial value for debug
+    this.debug = config.debug
   }
 
-  async query (query, linRead) {
-    const queryRequest = new protos.Request()
-    queryRequest.query = query
-    if (linRead || this.linRead) queryRequest.lin_read = createLinRead(linRead || this.linRead)
-    if (this.config.debug) console.log(`Query request: \n${query}\nLin Read: ${queryRequest.lin_read}`)
-    const resp = await this._query(queryRequest)
-    this.updateContext(resp.txn)
-    const parsed = {
-      data: JSON.parse(resp.json.toString()),
-      context: resp.txn,
-    }
-    if (this.config.debug) console.log(`Query response: \n${JSON.stringify(parsed, null, 2)}`)
-    return parsed
+  async mutate (mutation, options) {
+    return this.txn().mutate(mutation, {
+      commitNow: true,
+      ignoreConflict: true,
+      ...options,
+    })
   }
 
-  async mutate (mutation, commit = true, startTs) {
-    const mutationRequest = new protos.Mutation()
-    if (mutation.set) mutationRequest.set_nquads = Buffer.from(mutation.set, 'utf8')
-    if (mutation.del) mutationRequest.del_nquads = Buffer.from(mutation.del, 'utf8')
-    if (startTs) mutationRequest.start_ts = startTs
-    mutationRequest.commit_now = commit
-    if (this.config.debug) console.log(`Mutation request: \n${JSON.stringify(mutation, null, 2)}`)
-    const resp = await this._mutate(mutationRequest)
-    const parsed = {
-      data: {
-        uids: resp.uids,
-      },
-      context: resp.context,
-    }
-    if (this.config.debug) console.log(`Mutation response: \n${JSON.stringify(parsed, null, 2)}`)
-    return parsed
+  async query (query, vars = null) {
+    return this.txn().query(query, vars)
   }
 
   async alter (schema) {
-    const alterSchema = new protos.Operation()
-    alterSchema.schema = schema
-    return this._alter(alterSchema)
+    const op = new Operation()
+    op.setSchema(schema)
+    this.log('Alter request:', schema)
+    const resp = await this.client.alter(op)
+    this.log('Alter response:', resp.toObject())
+    return resp
   }
 
   async dropAll () {
-    const dropAllOp = new protos.Operation()
-    dropAllOp.drop_all = true
-    return this._alter(dropAllOp)
-  }
-
-  async dropAttr (attr) {
-    const dropAttr = new protos.Operation()
-    dropAttr.drop_atrr = attr
-    return this._alter(dropAttr)
+    const op = new Operation()
+    op.setDropAll(true)
+    this.log('Drop All request:')
+    const resp = await this.client.alter(op)
+    this.log('Drop All response:', resp.toObject())
+    return resp
   }
 
   txn () {
-    return new Transaction(this)
+    return new DgraphTransaction(this.client.newTxn(), this.debug)
   }
 
-  updateContext (context) {
-    if (context.lin_read) {
-      this.linRead = mergeMax(this.linRead, context.lin_read.ids)
+  close () {
+    this.stubs.forEach((stub) => {
+      stub.close()
+    })
+  }
+
+  log (event, ...params) {
+    if (this.debug) {
+      const stringy = params.map(param => JSON.stringify(param))
+      // eslint-disable-next-line no-console
+      console.log(event, ...stringy)
     }
   }
 }
+
+export default DgraphNodeClient

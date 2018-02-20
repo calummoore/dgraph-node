@@ -1,47 +1,59 @@
-import union from 'lodash/union'
-// import protos from './protos'
-import { mergeMax } from './util'
-import { createTxnContext } from './convert'
+import { Mutation } from 'dgraph-js'
 
-export default class Transaction {
-  constructor (client) {
-    this.client = client
-    this.startTs = null
-    this.linRead = client.linRead
-    this.keys = []
+class DgraphTransaction {
+  constructor (txn, debug) {
+    this.txn = txn
+    this.debug = debug
   }
 
-  async query (query) {
-    const resp = await this.client.query(query, this.linRead)
-    this.updateContext(resp.context, this.linRead)
-    return resp
+  async mutate (mutation, options) {
+    const mut = new Mutation()
+    const { commitNow, ignoreConflict } = options || {}
+    if (mutation.set) mut.setSetNquads(mutation.set)
+    if (mutation.del) mut.setDelNquads(mutation.del)
+    mut.setCommitNow(commitNow)
+    mut.setIgnoreIndexConflict(ignoreConflict)
+    this.log('Mutation request:', mutation, options)
+    const resp = await this.txn.mutate(mut)
+    const respMap = resp.getUidsMap().toObject() || []
+    const uids = {}
+    respMap.forEach(([name, uid]) => {
+      uids[name] = uid
+    })
+    const parsed = {
+      data: {
+        uids,
+      },
+    }
+    this.log('Mutation response:', parsed)
+    return parsed
   }
 
-  async mutate (mutation) {
-    const resp = await this.client.mutate(mutation, false, this.startTs)
-    this.updateContext(resp.context)
-    return resp
+  async query (query, vars = null) {
+    this.log('Query request:', query, vars)
+    const res = await this.txn.queryWithVars(query, vars)
+    const data = {
+      data: res.getJson(),
+    }
+    this.log('Query response:', data, vars)
+    return data
   }
 
   async commit () {
-    const { startTs, linRead, keys } = this
-    const txnContext = createTxnContext({
-      startTs,
-      linRead,
-      keys,
-    })
-    return this.client._commitOrAbort(txnContext)
+    return this.txn.commit()
   }
 
-  updateContext (context) {
-    if (this.startTs === null) {
-      this.startTs = context.start_ts
-    }
-    if (context.keys) {
-      this.keys = union(context.keys.map(s => s.toString()), this.keys || [])
-    }
-    if (context.lin_read) {
-      this.linRead = mergeMax(this.linRead, context.lin_read.ids)
+  async discard () {
+    return this.txn.discard()
+  }
+
+  log (event, ...params) {
+    if (this.debug) {
+      const stringy = params.map(param => JSON.stringify(param))
+      // eslint-disable-next-line no-console
+      console.log(event, ...stringy)
     }
   }
 }
+
+export default DgraphTransaction
