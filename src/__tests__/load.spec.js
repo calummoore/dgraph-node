@@ -14,7 +14,7 @@ describe('Load test', () => {
     await dgraph.dropAll()
   })
 
-  it('should not abort when no transactions are used', async () => {
+  xit('should not abort when no transactions are used', async () => {
     const stats = await run()
     expect(stats).toMatchObject({
       aborts: 0,
