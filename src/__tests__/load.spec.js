@@ -14,23 +14,24 @@ describe('Load test', () => {
     await dgraph.dropAll()
   })
 
-  xit('should not abort when no transactions are used', async () => {
+  it('should not abort when no transactions are used', async () => {
     const stats = await run()
-    expect(stats).toEqual({
+    expect(stats).toMatchObject({
       aborts: 0,
       exists: 0,
     })
 
-    const stats2 = await run()
+    const stats2 = await run(stats.siteId)
     expect(stats2).toEqual({
+      siteId: stats.siteId,
       aborts: 0,
       exists: 100,
     })
   })
 })
 
-async function run () {
-  const siteId = await createSite('Test Data')
+async function run (_siteId) {
+  const siteId = _siteId || await createSite('Test Data')
 
   let counter = customers.length
   let aborts = 0
@@ -39,26 +40,29 @@ async function run () {
   return new Promise((resolve) => {
     /* eslint-disable */
     customers.forEach(async (customer, i) => {
-      console.log(`Checking if customer ${customer.id} exitsts`)
+      // console.log(`Checking if customer ${customer.id} exitsts`)
 
       const custExists = await customerExists(siteId, customer.id)
       if (custExists) exists += 1
 
-      console.log(`Customer ${customer.id} exists: ${custExists ? 'YES': 'NO'}`)
+      // console.log(`Customer ${customer.id} exists: ${custExists ? 'YES': 'NO'}`)
 
       const uid = await createCustomer(siteId, customer, i)
       .catch((e) => {
-        console.log(customer.id, e.message)
-        console.log(`Customer ${customer.id} aborted. Total aborts: ${aborts += 1}`)
+        aborts += 1
+        // console.log(customer.id, e.message)
+        // console.log(`Customer ${customer.id} aborted. Total aborts: ${aborts}`)
       })
 
       if (uid) {
-        console.log(`Created customer ${customer.id}: ${uid}`)
+        // console.log(`Created customer ${customer.id}: ${uid}`)
       }
 
-      console.log('Remaining customers', counter -= 1)
+      counter -= 1
+      // console.log('Remaining customers', counter)
 
       if (counter === 0) resolve({
+        siteId,
         aborts,
         exists,
       })
@@ -69,19 +73,22 @@ async function run () {
 async function customerExists (siteId, customerId) {
   const query = `
     query {
-      root (func: uid(${siteId})) @filter(eq(customers.id, "${customerId}")) {
-        uid
+      root (func: uid(${siteId})) @normalize {
+        ~customers.site @filter(eq(customers.id, "${customerId}")) {
+          id: uid
+        }
       }
     }
   `
   const resp = await dgraph.query(query)
-  return !!(resp && resp.root && resp.root[0] && resp.root[0].uid)
+  const root = resp.data.root || []
+  return !!(root[0] && root[0].id)
 }
 
 async function createCustomer (siteId, customer, i) {
   const mutStr = mapObj(customer, (val, key) => `_:cust_${i} <customers.${key}> "${val}" .`)
     .concat([`
-      <${siteId}> <site.customers> _:cust_${i} .
+      _:cust_${i} <customers.site> <${siteId}> .
       _:cust_${i} <node.type> "customers" .
     `])
     .join('\n')
@@ -110,7 +117,7 @@ async function createSite (name) {
     customers.last_name: string @index(trigram) .
     customers.email: string @index(exact) .
     customers.gender: string @index(exact) .
-    site.customers: uid @reverse .
+    customers.site: uid @reverse .
   `
 
   await dgraph.alter(siteSchema)
