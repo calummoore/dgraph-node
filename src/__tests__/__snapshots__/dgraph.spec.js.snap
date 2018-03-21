@@ -1,5 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`dgraph should send a del using set command 1`] = `
+Object {
+  "data": Object {
+    "q": Array [],
+  },
+}
+`;
+
+exports[`dgraph should send a set JSON mutation 1`] = `
+Object {
+  "data": Object {
+    "q": Array [
+      Object {
+        "name": "Jane",
+      },
+    ],
+  },
+}
+`;
+
+exports[`dgraph should send a set using set command 1`] = `
+Object {
+  "data": Object {
+    "q": Array [
+      Object {
+        "name": "Peter",
+      },
+    ],
+  },
+}
+`;
+
 exports[`dgraph should send query 1`] = `
 Object {
   "q": Array [],

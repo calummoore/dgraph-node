@@ -1,5 +1,7 @@
 import { Mutation } from 'dgraph-js'
 
+const isString = obj => typeof obj === 'string'
+
 class DgraphTransaction {
   constructor (txn, debug) {
     this.txn = txn
@@ -9,8 +11,14 @@ class DgraphTransaction {
   async mutate (mutation, options) {
     const mut = new Mutation()
     const { commitNow, ignoreConflict } = options || {}
-    if (mutation.set) mut.setSetNquads(mutation.set)
-    if (mutation.del) mut.setDelNquads(mutation.del)
+    if (mutation.set) {
+      if (isString(mutation.set)) mut.setSetNquads(mutation.set)
+      else mut.setSetJson(mutation.set)
+    }
+    if (mutation.del) {
+      if (isString(mutation.del)) mut.setDelNquads(mutation.del)
+      else mut.setDeleteJson(mutation.del)
+    }
     mut.setCommitNow(commitNow)
     mut.setIgnoreIndexConflict(ignoreConflict)
     this.log('Mutation request:', mutation, options)
@@ -27,6 +35,14 @@ class DgraphTransaction {
     }
     this.log('Mutation response:', parsed)
     return parsed
+  }
+
+  async set (set, options) {
+    return this.mutate({ set }, options)
+  }
+
+  async del (del, options) {
+    return this.mutate({ del }, options)
   }
 
   async query (query, vars = null) {

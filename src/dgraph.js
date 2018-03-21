@@ -32,6 +32,14 @@ class DgraphNodeClient {
     })
   }
 
+  async set (set, options) {
+    return this.mutate({ set }, options)
+  }
+
+  async del (del, options) {
+    return this.mutate({ del }, options)
+  }
+
   async query (query, vars = null) {
     return this.txn().query(query, vars)
   }

@@ -33,6 +33,37 @@ describe('dgraph', () => {
     })
   })
 
+  it('should send a set JSON mutation', async () => {
+    const resp = await client.mutate({ set: { uid: '_:jane', name: 'Jane' } })
+    expect(resp.data).toHaveProperty('uids', {
+      jane: expect.any(String),
+    })
+
+    // Check it has committed
+    const query = await client.query(queryById(resp.data.uids.jane))
+    expect(query).toMatchSnapshot()
+  })
+
+  it('should send a set using set command', async () => {
+    const resp = await client.set({ uid: '_:peter', name: 'Peter' })
+    expect(resp.data).toHaveProperty('uids', {
+      peter: expect.any(String),
+    })
+
+    // Check it has committed
+    const query = await client.query(queryById(resp.data.uids.peter))
+    expect(query).toMatchSnapshot()
+  })
+
+  it('should send a del using set command', async () => {
+    const resp = await client.set({ uid: '_:peter', name: 'Peter' })
+    await client.del({ uid: resp.data.uids.peter })
+
+    // Check it has committed
+    const query = await client.query(queryById(resp.data.uids.peter))
+    expect(query).toMatchSnapshot()
+  })
+
   it('should commit mutation', async () => {
     const resp = await createBob()
     const { bob } = resp.data.uids
